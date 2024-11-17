@@ -18,7 +18,7 @@ import java.util.PriorityQueue;
  * <p>Основнi методи:</p>
  * <ul>
  *   <li>{@link #main(String[])} - Точка входу в програму.</li>
- *   <li>{@link #doDataOperation()} - Виконує основнi операцiї з даними.</li>
+ *   <li>{@link #doDataOperationWithLambdas()} - Виконує основнi операцiї з даними використовуючі функціональне програмування.</li>
  *   <li>{@link #sortArray()} - Сортує масив LocalDateTime.</li>
  *   <li>{@link #searchArray()} - Виконує пошук значення в масивi LocalDateTime.</li>
  *   <li>{@link #findMinAndMaxInArray()} - Знаходить мiнiмальне та максимальне значення в масивi LocalDateTime.</li>
@@ -60,7 +60,7 @@ public class BasicDataOperationUsingQueue {
 
     public static void main(String[] args) {  
         BasicDataOperationUsingQueue basicDataOperationUsingQueue = new BasicDataOperationUsingQueue(args);
-        basicDataOperationUsingQueue.doDataOperation();
+        basicDataOperationUsingQueue.doDataOperationWithLambdas();
     }
 
     /**
@@ -82,11 +82,11 @@ public class BasicDataOperationUsingQueue {
     }
 
     /**
-     * Виконує основнi операцiї з даними.
+     * Виконує основнi операцiї з даними використовуючі функціональне програмування.
      * 
      * Метод зчитує масив та чергу об'єктiв LocalDateTime з файлу, сортує їх та виконує пошук значення.
      */
-    private void doDataOperation() {
+    private void doDataOperationWithLambdas() {
         // операцiї з масивом дати та часу
         searchArray();
         findMinAndMaxInArray();
@@ -119,31 +119,30 @@ public class BasicDataOperationUsingQueue {
         // вимiрюємо час, витрачений на сортування масиву дати i часу 
         long startTime = System.nanoTime();
 
-        Arrays.sort(dateTimeArray);
+        dateTimeArray = Arrays.stream(dateTimeArray)
+                              .sorted()
+                              .toArray(LocalDateTime[]::new);
 
         Utils.printOperationDuration(startTime, "сортування масиву дати i часу");
     }
 
     /**
-     * Метод для пошуку значення в масивi дати i часу.
+     * Метод для пошуку значення в масивi дати i часу використовуючі функціональне програмування.
      */
     private void searchArray() {
         // вимiрюємо час, витрачений на пошук в масивi дати i часу
         long startTime = System.nanoTime();
-        
-        int index = Arrays.binarySearch(this.dateTimeArray, dateTimeValueToSearch);
-        
+
+        boolean found = Arrays.stream(dateTimeArray)
+                              .anyMatch(dateTime -> dateTime.equals(dateTimeValueToSearch));
+
         Utils.printOperationDuration(startTime, "пошук в масивi дати i часу");
 
-        if (index >= 0) {
-            System.out.println("Значення '" + dateTimeValueToSearch + "' знайдено в масивi за iндексом: " + index);
-        } else {
-            System.out.println("Значення '" + dateTimeValueToSearch + "' в масивi не знайдено.");
-        }
+        System.out.println("Значення " + dateTimeValueToSearch + (found ? " знайдено" : " не знайдено") + " в масиві.");
     }
 
     /**
-     * Знаходить мiнiмальне та максимальне значення в масивi LocalDateTime.
+     * Знаходить мiнiмальне та максимальне значення в масивi LocalDateTime використовуючі функціональне програмування.
      */
     private void findMinAndMaxInArray() {
         if (dateTimeArray == null || dateTimeArray.length == 0) {
@@ -154,32 +153,29 @@ public class BasicDataOperationUsingQueue {
         // вимiрюємо час, витрачений на пошук мiнiмальної i максимальної дати i часу
         long startTime = System.nanoTime();
 
-        LocalDateTime min = dateTimeArray[0];
-        LocalDateTime max = dateTimeArray[0];
+        LocalDateTime min = Arrays.stream(dateTimeArray)
+                                  .min(LocalDateTime::compareTo)
+                                  .orElse(null);
+
+        LocalDateTime max = Arrays.stream(dateTimeArray)
+                                  .max(LocalDateTime::compareTo)
+                                  .orElse(null);
 
         Utils.printOperationDuration(startTime, "пошук мiнiмальної i максимальної дати i часу в масивi");
-
-        for (LocalDateTime dateTime : dateTimeArray) {
-            if (dateTime.isBefore(min)) {
-                min = dateTime;
-            }
-            if (dateTime.isAfter(max)) {
-                max = dateTime;
-            }
-        }
 
         System.out.println("Мiнiмальне значення в масивi: " + min);
         System.out.println("Максимальне значення в масивi: " + max);
     }
 
     /**
-     * Метод для пошуку значення в черзi дати i часу.
+     * Метод для пошуку значення в черзi дати i часу використовуючі функціональне програмування.
      */
     private void searchQueue() {
         // вимiрюємо час, витрачений на пошук в черзi дати i часу
         long startTime = System.nanoTime();
 
-        boolean isFound = this.dateTimeQueue.contains(dateTimeValueToSearch);
+        boolean isFound = dateTimeQueue.stream()
+                           .anyMatch(dateTime -> dateTime.equals(dateTimeValueToSearch));
 
         Utils.printOperationDuration(startTime, "пошук в Queue дати i часу");
 
@@ -191,7 +187,7 @@ public class BasicDataOperationUsingQueue {
     }
 
     /**
-     * Знаходить мiнiмальне та максимальне значення в черзi LocalDateTime.
+     * Знаходить мiнiмальне та максимальне значення в черзi LocalDateTime використовуючі функціональне програмування.
      */
     private void findMinAndMaxInQueue() {
         if (dateTimeQueue == null || dateTimeQueue.isEmpty()) {
@@ -202,8 +198,13 @@ public class BasicDataOperationUsingQueue {
         // вимiрюємо час, витрачений на пошук мiнiмальної i максимальної дати i часу
         long startTime = System.nanoTime();
 
-        LocalDateTime min = Collections.min(dateTimeQueue);
-        LocalDateTime max = Collections.max(dateTimeQueue);
+        LocalDateTime min = dateTimeQueue.stream()
+                         .min(LocalDateTime::compareTo)
+                         .orElse(null);
+
+        LocalDateTime max = dateTimeQueue.stream()
+                         .max(LocalDateTime::compareTo)
+                         .orElse(null);
 
         Utils.printOperationDuration(startTime, "пошук мiнiмальної i максимальної дати i часу в Queue");
 
@@ -244,34 +245,25 @@ class Utils {
     static void printOperationDuration(long startTime, String operationName) {
         long endTime = System.nanoTime();
         long duration = (endTime - startTime);
-        System.out.println("\n>>>>>>>>>> Час виконання операцiї '" + operationName + "'': " + duration + " наносекунд");
+        System.out.println("\n>>>>>>>>> Час виконання операцiї '" + operationName + "': " + duration + " наносекунд");
     }
 
     /**
-     * Зчитує масив об'єктiв LocalDateTime з файлу.
+     * Зчитує масив об'єктiв LocalDateTime з файлу використовуючі функціональне програмування.
      * 
      * @param pathToFile Шлях до файлу з даними.
      * @return Масив об'єктiв LocalDateTime.
      */
     static LocalDateTime[] readArrayFromFile(String pathToFile) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-        LocalDateTime[] tempArray = new LocalDateTime[1000];
-        int index = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(pathToFile))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                LocalDateTime dateTime = LocalDateTime.parse(line, formatter);
-                tempArray[index++] = dateTime;
-            }
+            return br.lines()
+                          .map(dataLine -> LocalDateTime.parse(dataLine, formatter))
+                          .toArray(LocalDateTime[]::new);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Помилка читання даних з файлу: " + pathToFile, e);
         }
-
-        LocalDateTime[] finalArray = new LocalDateTime[index];
-        System.arraycopy(tempArray, 0, finalArray, 0, index);
-
-        return finalArray;
     }
 
     /**
@@ -287,7 +279,7 @@ class Utils {
                 writer.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Помилка запису даних з файлу: " + pathToFile, e);
         }
     }
 }

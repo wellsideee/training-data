@@ -185,8 +185,12 @@ public class BasicDataOperationUsingSet {
 
         long startTime = System.nanoTime();
 
-        LocalDateTime min = Collections.min(dateTimeSet);
-        LocalDateTime max = Collections.max(dateTimeSet);
+        LocalDateTime min = dateTimeSet.stream()
+                           .min(LocalDateTime::compareTo)
+                           .orElse(null);
+        LocalDateTime max = dateTimeSet.stream()
+                           .max(LocalDateTime::compareTo)
+                           .orElse(null);
 
         Utils.printOperationDuration(startTime, "пошук мiнiмальної i максимальної дати i часу в HashSet");
 

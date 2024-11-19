@@ -151,8 +151,6 @@ public class BasicDataOperationUsingList {
         LocalDateTime min = dateTimeArray[0];
         LocalDateTime max = dateTimeArray[0];
 
-        Utils.printOperationDuration(startTime, "пошук мiнiмальної i максимальної дати i часу в масивi");
-
         for (LocalDateTime dateTime : dateTimeArray) {
             if (dateTime.isBefore(min)) {
                 min = dateTime;
@@ -161,6 +159,8 @@ public class BasicDataOperationUsingList {
                 max = dateTime;
             }
         }
+
+        Utils.printOperationDuration(startTime, "пошук мiнiмальної i максимальної дати i часу в масивi");
 
         System.out.println("Мiнiмальне значення в масивi: " + min);
         System.out.println("Максимальне значення в масивi: " + max);
